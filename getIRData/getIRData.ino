@@ -9,6 +9,8 @@ const int NUM_RECVS = 8;
 int LED_PINS[] = {2, 3, 4}; // 3 IR LEDS
 int REC_PINS[] = {6, 7, 8, 9, 10, 11, 12, 13}; // 8 receivers
 
+IRrecv irrecv(11);
+
 IRrecv irrecvs[] = {IRrecv(6), IRrecv(7), IRrecv(8), IRrecv(9), IRrecv(10), IRrecv(11), IRrecv(12), IRrecv(13)};
 
 int cnt = 0;
@@ -17,8 +19,8 @@ jm_Scheduler scheduler;
 
 void sendIRSignal()
 {
-  Serial.print("Pulsing LED: ");
-  Serial.println(LED_PINS[cnt]);
+  //Serial.print("Pulsing LED: ");
+  //Serial.println(LED_PINS[cnt]);
   pulseIR(100000, LED_PINS[cnt]);
 
   cnt++;
@@ -51,6 +53,7 @@ void sendIRSignal()
 
 void setup()   {     
   Serial.begin(9600);
+  irrecv.enableIRIn();
             
   // initialize the IR pins as outputs
   for (int i = 0; i < NUM_LEDS; i++)
@@ -67,8 +70,8 @@ void setup()   {
   Serial.println("Collecting data...");   
 
   scheduler.start(sendIRSignal, TIMESTAMP_1MS*100);
-  Serial.println("Test2");
-  scheduler.start(recSignal, TIMESTAMP_1MS);
+  //Serial.println("Test2");
+  //scheduler.start(recSignal, TIMESTAMP_1MS);
   
   //digitalWrite(LED_PINS[0], HIGH);  // this takes about 3 microseconds to happen
 }
@@ -76,11 +79,16 @@ void setup()   {
 void loop()                    
 {  
   yield();
-  /*
-  Serial.println("Test3");
+  
+  //Serial.println("Test3");
   
   decode_results results;
-  
+  if (irrecv.decode(&results))
+  {
+    Serial.println(results.value, HEX);
+    irrecv.resume();
+  }
+  /*
   for (int i = 0; i < NUM_RECVS; i++)
   {
     Serial.print("Receiver: ");
