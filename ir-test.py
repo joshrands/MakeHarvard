@@ -18,7 +18,8 @@ try:
 	while True:
 		GPIO.output(IR_LED1, True)
 		time.sleep(1)
-
+                GPIO.output(IR_LED1, False)
+                time.sleep(1)
 	time.sleep(.0001)
 
 except(KeyboardInterrupt, SystemExit):
