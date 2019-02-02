@@ -1,30 +1,108 @@
 /* Get IR Data from brain */
 /* MakeHarvard 2019 */
 #include <IRremote.h>
+#include <jm_Scheduler.h>
 
-int IR_PINS = [3, 4, 5];
+const int NUM_LEDS = 3;
+const int NUM_RECVS = 8;
 
-int IRledPin =  13;    // LED connected to digital pin 13
+int LED_PINS[] = {2, 3, 4}; // 3 IR LEDS
+int REC_PINS[] = {6, 7, 8, 9, 10, 11, 12, 13}; // 8 receivers
 
-// The setup() method runs once, when the sketch starts
+IRrecv irrecvs[] = {IRrecv(6), IRrecv(7), IRrecv(8), IRrecv(9), IRrecv(10), IRrecv(11), IRrecv(12), IRrecv(13)};
 
-void setup()   {               
-  // initialize the IR digital pin as an output:
-  pinMode(IRledPin, OUTPUT);     
+int cnt = 0;
 
+jm_Scheduler scheduler;
+
+void sendIRSignal()
+{
+  Serial.print("Pulsing LED: ");
+  Serial.println(LED_PINS[cnt]);
+  pulseIR(100000, LED_PINS[cnt]);
+
+  cnt++;
+  if (cnt == NUM_LEDS)
+    cnt = 0;
+}
+
+/*void recSignal()
+{
+  Serial.print("Test");
+  
+  decode_results results;
+  
+  for (int j = 0; j < NUM_RECVS; j++)
+  {
+    Serial.print("Receiver: ");
+    Serial.println(REC_PINS[j]);
+    if (irrecvs[j].decode(&results))
+    {
+      Serial.println("RECEIVED DATA");
+      Serial.println(results.bits, DEC);
+      /*dumpInfo(&results);           // Output the results
+      dumpRaw(&results);            // Output the results in RAW format
+      dumpCode(&results);           // Output the results as source code
+      Serial.println("");           // Blank line between entries
+      irrecvs[j].resume();              // Prepare for the next value
+    }
+  }
+}*/
+
+void setup()   {     
   Serial.begin(9600);
+            
+  // initialize the IR pins as outputs
+  for (int i = 0; i < NUM_LEDS; i++)
+  {
+    pinMode(LED_PINS[i], OUTPUT);
+  }
+
+  for (int i = 0; i < NUM_RECVS; i++)
+  {
+    //irrecvs[i] = IRrecv(REC_PINS[i]);
+    irrecvs[i].enableIRIn();
+  }
+
+  Serial.println("Collecting data...");   
+
+  scheduler.start(sendIRSignal, TIMESTAMP_1MS*100);
+  Serial.println("Test2");
+  scheduler.start(recSignal, TIMESTAMP_1MS);
+  
+  //digitalWrite(LED_PINS[0], HIGH);  // this takes about 3 microseconds to happen
 }
 
 void loop()                    
-{
-  SendChannelUpCode();
-
-  delay(1000);//20*1000);  // wait twenty seconds (20 seconds * 1000 milliseconds) Change this value for different intervals.
+{  
+  yield();
+  /*
+  Serial.println("Test3");
+  
+  decode_results results;
+  
+  for (int i = 0; i < NUM_RECVS; i++)
+  {
+    Serial.print("Receiver: ");
+    Serial.println(REC_PINS[i]);
+    if (irrecvs[i].decode(&results))
+    {
+      Serial.println("RECEIVED DATA");
+      Serial.println(results.bits, DEC);
+      /*dumpInfo(&results);           // Output the results
+      dumpRaw(&results);            // Output the results in RAW format
+      dumpCode(&results);           // Output the results as source code
+      Serial.println("");           // Blank line between entries
+      irrecvs[i].resume();              // Prepare for the next value
+    }
+  }
+*/
+  //delay(10);//20*1000);  // wait twenty seconds (20 seconds * 1000 milliseconds) Change this value for different intervals.
 }
 
 // This procedure sends a 38KHz pulse to the IRledPin
 // for a certain # of microseconds. We'll use this whenever we need to send codes
-void pulseIR(long microsecs) {
+void pulseIR(long microsecs, int IRledPin) {
   // we'll count down from the number of microseconds we are told to wait
 
   cli();  // this turns off any background interrupts
@@ -43,6 +121,12 @@ void pulseIR(long microsecs) {
   sei();  // this turns them back on
 }
 
+void sendData(int val)
+{
+  
+}
+
+/*
 void SendChannelUpCode() {
   // This is the code for the CHANNEL + for the TV COMCAST
  
@@ -116,4 +200,4 @@ void SendChannelUpCode() {
   pulseIR(240);
   delayMicroseconds(700);
   pulseIR(240);
-}
+}*/
