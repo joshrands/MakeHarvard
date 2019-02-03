@@ -20,12 +20,12 @@ ir = []
 # TODO: ADD SYNC
 
 def addIR(data):
-	print(data)
 	word = data.decode()
-	print(word)
 	val = int(word[len(word) - 2])	
+
+	print("IR Receiver: " + str(val))
 	
-	if (data == b'IR1_0' or data == b'IR1_1'):
+	if (data == b'IR9_0\n' or data == b'IR9_1\n'):
 		print(ir)
 		# new data, clear ir table
 		del ir[:]
