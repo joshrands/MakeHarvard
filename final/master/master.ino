@@ -14,6 +14,8 @@ int currentPin = 2;
 const int MIN_PIN = 2;
 const int MAX_PIN = 11;
 
+int BUTTON_PIN = 13;
+
 IRrecv irrecv(currentPin);
 
 void accelSetup()
@@ -29,10 +31,22 @@ void irSetup()
   Serial.println("Enabled IRin");
 }
 
+void sync()
+{
+  pinMode(BUTTON_PIN, INPUT);
+
+  while (digitalRead(BUTTON_PIN) == LOW)
+  {
+    Serial.println("Press button to sync...");
+    delay(10);
+  }
+}
+
 void setup() {
   Serial.begin(9600);
   accelSetup();
   irSetup();
+  sync();
 }
 
 void checkAccel()
