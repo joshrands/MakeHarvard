@@ -16,6 +16,8 @@ const int MAX_PIN = 11;
 
 int BUTTON_PIN = 13;
 
+int ticks = 0;
+
 IRrecv irrecv(currentPin);
 
 void accelSetup()
@@ -83,36 +85,46 @@ void checkAccel()
 
 void checkIR()
 {
-  // set the current IR receiver in question
-  irrecv.setPort(currentPin);
-
-  decode_results results;
-
-  Serial.print("IR"); // tell ground station this is IR data
-
-  // adjust pin for delay
-  if (currentPin == MIN_PIN)
-    Serial.print(MAX_PIN - 1);
-  else
-    Serial.print(currentPin - 1);
-
-  Serial.print("_");  
-  
-  if (irrecv.decode(&results)) {
-    Serial.print("1\n");
-    // we don't care about the value. Serial.println(results.value, HEX);
-    irrecv.resume(); // Receive the next value
-  }
-  else
-  {
-    Serial.print("0\n");
-  }
-
   // move to next pin
   currentPin++;
   if (currentPin == MAX_PIN)
-    currentPin = MIN_PIN;
-
+  {
+    ticks++;
+    currentPin = MAX_PIN - 1;
+    // wait however many steps
+    if (ticks >= 8)
+    {
+      ticks = 0;
+      currentPin = MIN_PIN - 1;
+    }
+  }
+  else
+  {  
+    // set the current IR receiver in question
+    irrecv.setPort(currentPin);
+  
+    decode_results results;
+  
+    Serial.print("IR"); // tell ground station this is IR data
+  
+    // adjust pin for delay
+    if (currentPin == MIN_PIN)
+      Serial.print(MAX_PIN - 1);
+    else
+      Serial.print(currentPin - 1);
+  
+    Serial.print("_");  
+    
+    if (irrecv.decode(&results)) {
+      Serial.print("1\n");
+      // we don't care about the value. Serial.println(results.value, HEX);
+      irrecv.resume(); // Receive the next value
+    }
+    else
+    {
+      Serial.print("0\n");
+    }
+  }
   //delay(125); // wait 1/8 sec
 }
 

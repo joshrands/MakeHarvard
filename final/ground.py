@@ -9,20 +9,21 @@ x = input("Sync boards and press enter.")
 # get master and slave ports
 masterPort = "/dev/ttyUSB0"
 #masterPort = input("Enter master port: ")
-slavePort = "/dev/ttyACM1"
+slavePort = "/dev/ttyUSB2"
 #slavePort = input("Enter slave port: ") 
 
 master = serial.Serial(masterPort)
-slave = serial.Serial(slavePort)
+#slave = serial.Serial(slavePort)
 
 ir = []
 
 # TODO: ADD SYNC
 
 def addIR(data):
-
+	print(data)
 	word = data.decode()
-	val = int(word[len(word) - 1])	
+	print(word)
+	val = int(word[len(word) - 2])	
 	
 	if (data == b'IR1_0' or data == b'IR1_1'):
 		print(ir)
@@ -50,18 +51,19 @@ while True:
 	elif (masterData == b'A_F\n'):
 		print("Sending power forward signal...")
 		slaveSig = '2'
-	else:
+	elif (masterData == b'A_0\n'):
 		# this is IR data, run model
-		print("No turn signal. IR Data")
-		slaveSig = 'f'
-		addIR(masterData)
-	
-	# send data
-	if (slave.write(slaveSig.encode()) > 0):
-		print("Data sent to slave.")	
+		print("Stop")
+		slaveSig = '0'
+		#addIR(masterData)
 	else:
-		print("Error sending data to slave.")
+		addIR(masterData)
+		slaveSig = 'f'	
 
+	# send data
+#	if (slave.write(slaveSig.encode()) > 0):
+#		print("Data sent to slave.")	
+#	else:
+#		print("Error sending data to slave.")
 
-#def processIR():
 	
