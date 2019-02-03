@@ -2,9 +2,10 @@
 
 const int NUM_LEDS = 3;
 int LED_PINS[NUM_LEDS] = {4, 5, 6}; // 3 IR LEDS
+int SYNC_PIN = 2;
 
-const int PULSE_TIME = 1000000;
-const int INTER_PULSE = 100;
+const long PULSE_TIME = 1000000;
+const unsigned int INTER_PULSE = 1000;
 
 int count = 0;
 
@@ -37,8 +38,9 @@ void setup() {
   for (int i = 0; i < NUM_LEDS; i++)
   {
     pinMode(LED_PINS[i], OUTPUT);
-    digitalWrite(LED_PINS[i], HIGH);
+    //digitalWrite(LED_PINS[i], HIGH);
   }
+  pinMode(SYNC_PIN, OUTPUT);
 
 }
 
@@ -47,7 +49,14 @@ void loop() {
   Serial.print("Pulsing LED: ");
   Serial.println(LED_PINS[count]);
 
+  if (count == 0)
+  {
+    Serial.println("Sync active");
+    digitalWrite(SYNC_PIN, HIGH);
+  }
+
   long microsecs = PULSE_TIME;
+  Serial.println(microsecs);
   while (microsecs > 0) {
     // 38 kHz is about 13 microseconds high and 13 microseconds low
     digitalWrite(LED_PINS[count], HIGH);  // this takes about 3 microseconds to happen
@@ -59,6 +68,11 @@ void loop() {
     microsecs -= 26;
   }
   //pulseIR(PULSE_TIME, LED_PINS[count]);
+  if (count == 0)
+  {
+    Serial.println("Sync deactivated.");
+    digitalWrite(SYNC_PIN, LOW);
+  }
 
   count++;
   if (count == NUM_LEDS)

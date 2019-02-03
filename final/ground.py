@@ -4,6 +4,8 @@ import serial
 import time
 from helper import *
 
+x = input("Sync boards and press enter.")
+
 # get master and slave ports
 masterPort = "/dev/ttyUSB0"
 #masterPort = input("Enter master port: ")
