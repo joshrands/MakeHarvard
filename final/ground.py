@@ -19,10 +19,23 @@ while True:
 	print(masterData)
 
 	slaveSig = 0
-	if (masterData == b'A_R\n'):
+
+	if (masterData == b'A_L\n'):
+		print("Sending turn left signal...")
+		slaveSig = 1
+	elif (masterData == b'A_R\n'):
 		print("Sending turn right signal...")	
 		slaveSig = 3
-
+	elif (masterData == b'A_F\n'):
+		print("Sending power forward signal...")
+		slaveSig = 2
+	else:
+		# this is IR data, run model
+		print("IR Data")
 	
-
+	# send data
+	if (slavePort.send(slaveSig.encode()) > 0):
+		print("Data sent to slave.")	
+	else:
+		print("Error sending data to slave.")
  
