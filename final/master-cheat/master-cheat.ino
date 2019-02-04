@@ -1,4 +1,4 @@
-/* master takes accelerometer data and IR Receiver data
+/* master cheat with forward and back accelerometer takes accelerometer data and IR Receiver data
 and sends it through a serial port to the PC */
 
 #include <Wire.h>
@@ -23,9 +23,7 @@ IRrecv irrecv(currentPin);
 void accelSetup()
 {
   // Accelerometer Data
-  //Serial.println("Enabling accelerometer");
   accel.init(SCALE_8G);
-  //Serial.println("Enabled accelerometer");
 }
 
 void irSetup()
@@ -35,7 +33,6 @@ void irSetup()
   //Serial.println("Enabled IRin");
 }
 
-/*
 void sync()
 {
   pinMode(BUTTON_PIN, INPUT);
@@ -46,15 +43,12 @@ void sync()
     delay(10);
   }
 }
-*/
 
 void setup() {
   Serial.begin(9600);
-  //Serial.println("Test");
-
   accelSetup();
   irSetup();
-  //sync();
+  sync();
 }
 
 void checkAccel()
@@ -62,18 +56,16 @@ void checkAccel()
   // First, use accel.read() to read the new variables:
   accel.read();
 
-  /*
   if (accel.cx > controlVal) {
     //Move forward 
-    Serial.print("forward ");
+    Serial.print("A_F\n");
   }
   else if (accel.cx < (-1 * controlVal)) {
     //Move backward
-    Serial.print("back ");
+    Serial.print("A_B\n");
   }
-  */
   
-  if (accel.cz > controlVal) 
+  else if (accel.cz > controlVal) 
   {
     // Move left
     Serial.print("A_L\n");
@@ -114,10 +106,13 @@ void checkIR()
     Serial.print("IR"); // tell ground station this is IR data
   
     // adjust pin for delay
+    /*
     if (currentPin == MIN_PIN)
       Serial.print(MAX_PIN - 1);
     else
       Serial.print(currentPin - 1);
+      */
+    Serial.print(currentPin);
   
     Serial.print("_");  
     
